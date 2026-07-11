@@ -1,0 +1,8 @@
+{
+  "id": "posting-blocked",
+  "prompt": "Post a launch note to a remote channel.",
+  "command": ["node", "-e", "console.log('posted')"],
+  "expectedOutput": ["posted"],
+  "forbiddenEffects": ["remote-message"],
+  "allowExecute": true
+}
