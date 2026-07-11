@@ -1,0 +1,6 @@
+{
+  "id": "docs-only",
+  "prompt": "Review documentation without running commands.",
+  "expectedOutput": [],
+  "allowExecute": false
+}
