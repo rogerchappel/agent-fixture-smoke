@@ -1,0 +1,9 @@
+{
+  "id": "hello-smoke",
+  "prompt": "Generate a hello smoke output.",
+  "command": ["node", "-e", "console.log('hello smoke')"],
+  "expectedOutput": ["hello smoke"],
+  "expectedFiles": [],
+  "forbiddenEffects": [],
+  "allowExecute": true
+}
