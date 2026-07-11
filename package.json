@@ -1,0 +1,25 @@
+{
+  "name": "agent-fixture-smoke",
+  "version": "0.1.0",
+  "description": "Turn agent workflow fixtures into deterministic local smoke evidence.",
+  "type": "module",
+  "bin": {
+    "agent-fixture-smoke": "./bin/agent-fixture-smoke.js"
+  },
+  "scripts": {
+    "build": "node scripts/build.js",
+    "check": "node scripts/check.js",
+    "smoke": "node bin/agent-fixture-smoke.js report fixtures/pass.json --format markdown",
+    "test": "node --test"
+  },
+  "keywords": [
+    "agent",
+    "fixtures",
+    "smoke-test",
+    "release-evidence"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  }
+}
