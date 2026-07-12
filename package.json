@@ -10,7 +10,9 @@
     "build": "node scripts/build.js",
     "check": "node scripts/check.js",
     "smoke": "node bin/agent-fixture-smoke.js report fixtures/pass.json --format markdown",
-    "test": "node --test"
+    "test": "node --test",
+    "package:smoke": "node scripts/package-smoke.js",
+    "release:check": "npm run check && npm test && npm run smoke && npm run package:smoke"
   },
   "keywords": [
     "agent",
@@ -21,5 +23,24 @@
   "license": "MIT",
   "engines": {
     "node": ">=20"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rogerchappel/agent-fixture-smoke.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rogerchappel/agent-fixture-smoke/issues"
+  },
+  "homepage": "https://github.com/rogerchappel/agent-fixture-smoke#readme",
+  "files": [
+    "bin",
+    "src",
+    "scripts",
+    "fixtures",
+    "docs",
+    "SKILL.md",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ]
 }
