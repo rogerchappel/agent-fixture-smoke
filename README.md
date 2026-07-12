@@ -8,6 +8,7 @@
 npm install
 npm test
 npm run release:check
+node bin/agent-fixture-smoke.js --version
 node bin/agent-fixture-smoke.js plan fixtures/pass.json --format markdown
 node bin/agent-fixture-smoke.js run fixtures/pass.json
 node bin/agent-fixture-smoke.js report fixtures/blocked.json --format markdown
