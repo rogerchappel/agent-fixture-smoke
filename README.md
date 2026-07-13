@@ -7,6 +7,8 @@
 ```bash
 npm install
 npm test
+npm run release:check
+node bin/agent-fixture-smoke.js --version
 node bin/agent-fixture-smoke.js plan fixtures/pass.json --format markdown
 node bin/agent-fixture-smoke.js run fixtures/pass.json
 node bin/agent-fixture-smoke.js report fixtures/blocked.json --format markdown
@@ -23,3 +25,13 @@ Commands run only when the fixture sets `allowExecute: true` and the caller uses
 ## Limitations
 
 This tool checks deterministic local commands. It does not call LLMs, browse websites, or validate subjective response quality.
+
+## Release Verification
+
+Run the same gate used by CI before cutting a release or handing the package to another agent:
+
+```bash
+npm run release:check
+```
+
+The release check runs syntax checks, the Node test suite, CLI smoke coverage, and an `npm pack --dry-run` package contents assertion.
