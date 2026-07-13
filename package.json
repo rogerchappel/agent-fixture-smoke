@@ -6,6 +6,18 @@
   "bin": {
     "agent-fixture-smoke": "./bin/agent-fixture-smoke.js"
   },
+  "files": [
+    "bin",
+    "src",
+    "scripts",
+    "SKILL.md",
+    "README.md",
+    "docs",
+    "fixtures",
+    "LICENSE",
+    "SECURITY.md",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "build": "node scripts/build.js",
     "check": "node scripts/check.js",
@@ -21,9 +33,6 @@
     "release-evidence"
   ],
   "license": "MIT",
-  "engines": {
-    "node": ">=20"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rogerchappel/agent-fixture-smoke.git"
@@ -32,15 +41,7 @@
     "url": "https://github.com/rogerchappel/agent-fixture-smoke/issues"
   },
   "homepage": "https://github.com/rogerchappel/agent-fixture-smoke#readme",
-  "files": [
-    "bin",
-    "src",
-    "scripts",
-    "fixtures",
-    "docs",
-    "SKILL.md",
-    "README.md",
-    "LICENSE",
-    "CHANGELOG.md"
-  ]
+  "engines": {
+    "node": ">=20"
+  }
 }

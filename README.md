@@ -14,6 +14,18 @@ node bin/agent-fixture-smoke.js run fixtures/pass.json
 node bin/agent-fixture-smoke.js report fixtures/blocked.json --format markdown
 ```
 
+## Demo
+
+Generate a small release evidence packet from the checked-in fixtures:
+
+```bash
+bash demo/run-release-evidence.sh
+```
+
+See [docs/tutorials/release-evidence-from-fixtures.md](docs/tutorials/release-evidence-from-fixtures.md)
+for the walkthrough and [docs/promo/demo-brief.md](docs/promo/demo-brief.md)
+for a short video outline and social hooks.
+
 ## Fixture Shape
 
 Fixtures are JSON files with `prompt`, optional `command`, `expectedOutput`, `expectedFiles`, `forbiddenEffects`, and `allowExecute`.
