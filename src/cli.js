@@ -2,6 +2,7 @@ import { loadFixtures } from "./fixtures.js";
 import { createPlan } from "./planner.js";
 import { runPlan } from "./runner.js";
 import { renderJson, renderMarkdown } from "./reporter.js";
+import packageJson from "../package.json" with { type: "json" };
 
 const usage = `Usage:
   agent-fixture-smoke plan <fixture...> [--format json|markdown]
@@ -11,6 +12,10 @@ const usage = `Usage:
 
 export async function main(argv) {
   const [command, ...rest] = argv;
+  if (command === "--version" || command === "-v") {
+    console.log(packageJson.version);
+    return;
+  }
   const formatIndex = rest.indexOf("--format");
   const format = formatIndex === -1 ? "json" : rest[formatIndex + 1];
   const paths = rest.filter((item, index) => item !== "--format" && index !== formatIndex + 1);

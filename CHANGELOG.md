@@ -1,7 +1,9 @@
 # Changelog
 
-## 0.1.0
+All notable changes to this project will be documented in this file.
 
-- Initial public release candidate for deterministic agent workflow fixture smoke checks.
-- Added plan, run, and report commands for local release evidence.
-- Added fixture examples for passing, blocked, and skipped workflows.
+## 0.1.0 - Initial release candidate
+
+- Added deterministic fixture planning, running, and release-evidence reporting.
+- Included pass, blocked, and skipped fixture examples for local smoke coverage.
+- Added CLI entry points for `plan`, `run`, and `report` workflows.
