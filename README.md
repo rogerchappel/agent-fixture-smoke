@@ -46,4 +46,4 @@ Run the same gate used by CI before cutting a release or handing the package to 
 npm run release:check
 ```
 
-The release check runs syntax checks, the Node test suite, CLI smoke coverage, and an `npm pack --dry-run` package contents assertion.
+The release check runs syntax checks, the Node test suite, CLI smoke coverage, and an `npm pack --dry-run` package contents assertion. The package smoke includes the demo script, tutorial, and promo brief so the public quickstart artifacts stay publishable with the CLI.
