@@ -20,11 +20,11 @@ export async function runPlan(plan, options = {}) {
 
 async function runItem(item, options) {
   if (!item.command) return { id: item.id, status: "skipped", notes: ["No command provided."] };
-  if (item.mode !== "executable" || !options.execute) {
-    return { id: item.id, status: "pass", notes: ["Dry-run plan only."], checks: item.checks };
-  }
   if (item.checks.some((check) => check.type === "forbidden-effect")) {
     return { id: item.id, status: "blocked", notes: ["Fixture declares forbidden side effects."] };
+  }
+  if (item.mode !== "executable" || !options.execute) {
+    return { id: item.id, status: "pass", notes: ["Dry-run plan only."], checks: item.checks };
   }
   const { stdout } = await execFileAsync(item.command[0], item.command.slice(1), { timeout: 5000 });
   const failures = [];
