@@ -7,6 +7,7 @@ import { join } from "node:path";
 import { loadFixtures } from "../src/fixtures.js";
 import { createPlan } from "../src/planner.js";
 import { runPlan } from "../src/runner.js";
+import { renderJson, renderMarkdown } from "../src/reporter.js";
 import packageJson from "../package.json" with { type: "json" };
 
 test("creates dry-run smoke plans from fixtures", async () => {
@@ -20,6 +21,64 @@ test("blocks fixtures with forbidden effects", async () => {
   const fixtures = await loadFixtures(["fixtures/blocked.json"]);
   const report = await runPlan(createPlan(fixtures), { execute: true });
   assert.equal(report.summary.blocked, 1);
+});
+
+test("records a nonzero command and continues to later fixtures", async () => {
+  const plan = [
+    {
+      id: "fails",
+      command: [process.execPath, "-e", "console.log('before exit'); console.error('boom'); process.exit(7)"],
+      mode: "executable",
+      checks: []
+    },
+    {
+      id: "continues",
+      command: [process.execPath, "-e", "console.log('after')"],
+      mode: "executable",
+      checks: [{ type: "stdout-contains", value: "after" }]
+    }
+  ];
+
+  const report = await runPlan(plan, { execute: true });
+
+  assert.deepEqual(report.summary, { passed: 1, failed: 1, blocked: 0, skipped: 0 });
+  assert.equal(report.results[0].status, "fail");
+  assert.equal(report.results[0].exitCode, 7);
+  assert.match(report.results[0].stdout, /before exit/);
+  assert.match(report.results[0].stderr, /boom/);
+  assert.deepEqual(report.results[0].failures, ["Command exited with code 7."]);
+  assert.equal(report.results[1].id, "continues");
+  assert.equal(report.results[1].status, "pass");
+
+  const json = JSON.parse(renderJson(report));
+  assert.deepEqual(json.results.map((item) => item.id), ["fails", "continues"]);
+  const markdown = renderMarkdown(report);
+  assert.match(markdown, /Failed: 1/);
+  assert.match(markdown, /## fails[\s\S]*Exit code: 7[\s\S]*before exit[\s\S]*boom/);
+  assert.match(markdown, /## continues[\s\S]*Status: pass/);
+});
+
+test("records timeout and spawn errors as fixture failures", async () => {
+  const report = await runPlan([
+    {
+      id: "timeout",
+      command: [process.execPath, "-e", "setTimeout(() => {}, 1000)"],
+      mode: "executable",
+      checks: []
+    },
+    {
+      id: "missing-command",
+      command: [join(tmpdir(), "agent-fixture-smoke-command-that-does-not-exist")],
+      mode: "executable",
+      checks: []
+    }
+  ], { execute: true, commandTimeoutMs: 20 });
+
+  assert.equal(report.summary.failed, 2);
+  assert.equal(report.results[0].timedOut, true);
+  assert.match(report.results[0].failures[0], /timed out/);
+  assert.equal(report.results[1].timedOut, false);
+  assert.match(report.results[1].failures[0], /could not start \(ENOENT\)/);
 });
 
 test("reports forbidden effects as blocked without executing in report mode", async () => {
