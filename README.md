@@ -34,6 +34,8 @@ Fixtures are JSON files with `prompt`, optional `command`, `expectedOutput`, `ex
 
 Commands run only when the fixture sets `allowExecute: true` and the caller uses `run`. The `report` command stays in dry-run mode and is suitable for release notes.
 
+Executable fixtures are isolated from one another at the reporting boundary. If a command exits nonzero, times out after five seconds, or cannot start, its result is marked `fail` with available exit, signal, stdout, and stderr diagnostics. Later fixtures still run, the complete JSON or Markdown report is printed, and the CLI exits nonzero after reporting all results.
+
 ## Limitations
 
 This tool checks deterministic local commands. It does not call LLMs, browse websites, or validate subjective response quality.

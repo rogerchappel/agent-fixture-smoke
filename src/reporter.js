@@ -13,8 +13,17 @@ export function renderMarkdown(report) {
     lines.push(`## ${item.id}`, "", `Status: ${item.status}`, "");
     for (const note of item.notes ?? []) lines.push(`- ${note}`);
     for (const failure of item.failures ?? []) lines.push(`- ${failure}`);
+    if (item.exitCode != null) lines.push(`- Exit code: ${item.exitCode}`);
+    if (item.signal) lines.push(`- Signal: ${item.signal}`);
+    appendOutput(lines, "Stdout", item.stdout);
+    appendOutput(lines, "Stderr", item.stderr);
   }
   return lines.join("\n");
+}
+
+function appendOutput(lines, label, output) {
+  if (!output) return;
+  lines.push("", `${label}:`, "", ...output.trimEnd().split("\n").map((line) => `    ${line}`));
 }
 
 function renderPlan(plan) {
