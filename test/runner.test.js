@@ -64,3 +64,48 @@ test("prints package version for CLI smoke checks", () => {
   assert.equal(result.status, 0);
   assert.equal(result.stdout.trim(), packageJson.version);
 });
+
+function runCli(...args) {
+  return spawnSync(process.execPath, ["bin/agent-fixture-smoke.js", ...args], {
+    encoding: "utf8",
+  });
+}
+
+test("CLI defaults to JSON and retains every fixture path", () => {
+  const result = runCli("plan", "fixtures/pass.json", "fixtures/skipped.json");
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(JSON.parse(result.stdout).plan.length, 2);
+});
+
+test("CLI supports explicit JSON and Markdown formats", () => {
+  const json = runCli("report", "fixtures/pass.json", "--format", "json");
+  assert.equal(json.status, 0, json.stderr);
+  assert.doesNotThrow(() => JSON.parse(json.stdout));
+
+  const markdown = runCli("plan", "fixtures/pass.json", "--format", "markdown");
+  assert.equal(markdown.status, 0, markdown.stderr);
+  assert.match(markdown.stdout, /^# Agent Fixture Smoke Plan/m);
+});
+
+test("CLI rejects missing and unsupported format values", () => {
+  const missing = runCli("plan", "fixtures/pass.json", "--format");
+  assert.notEqual(missing.status, 0);
+  assert.match(missing.stderr, /Missing value for --format/);
+
+  const unsupported = runCli("plan", "fixtures/pass.json", "--format", "yaml");
+  assert.notEqual(unsupported.status, 0);
+  assert.match(unsupported.stderr, /Unsupported format: yaml/);
+});
+
+test("CLI rejects unknown commands before loading fixtures", () => {
+  const result = runCli("deploy", "fixtures/does-not-exist.json");
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /Unknown command: deploy/);
+  assert.doesNotMatch(result.stderr, /does-not-exist/);
+});
+
+test("documented run command works without an explicit format", () => {
+  const result = runCli("run", "fixtures/pass.json");
+  assert.equal(result.status, 0, result.stderr);
+  assert.doesNotThrow(() => JSON.parse(result.stdout));
+});
