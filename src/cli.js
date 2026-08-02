@@ -16,17 +16,31 @@ export async function main(argv) {
     console.log(packageJson.version);
     return;
   }
+  if (!command || command === "--help" || command === "-h") {
+    console.log(usage.trim());
+    return;
+  }
+  if (!["plan", "run", "report"].includes(command)) {
+    throw new Error(`Unknown command: ${command}`);
+  }
   const formatIndex = rest.indexOf("--format");
   const format = formatIndex === -1 ? "json" : rest[formatIndex + 1];
-  const paths = rest.filter((item, index) => item !== "--format" && index !== formatIndex + 1);
-  if (!command || command === "--help" || command === "-h" || paths.length === 0) {
+  if (formatIndex !== -1 && !format) {
+    throw new Error("Missing value for --format (expected json or markdown)");
+  }
+  if (!["json", "markdown"].includes(format)) {
+    throw new Error(`Unsupported format: ${format}`);
+  }
+  const paths = formatIndex === -1
+    ? rest
+    : rest.filter((_, index) => index !== formatIndex && index !== formatIndex + 1);
+  if (paths.length === 0) {
     console.log(usage.trim());
     return;
   }
   const fixtures = await loadFixtures(paths);
   const plan = createPlan(fixtures);
   const report = command === "plan" ? { plan } : await runPlan(plan, { execute: command === "run" });
-  if (!["plan", "run", "report"].includes(command)) throw new Error(`Unknown command: ${command}`);
   console.log(format === "markdown" ? renderMarkdown(report) : renderJson(report));
   if (report.summary?.failed > 0 || report.summary?.blocked > 0) process.exitCode = 1;
 }
