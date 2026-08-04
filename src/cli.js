@@ -10,6 +10,38 @@ const usage = `Usage:
   agent-fixture-smoke report <fixture...> [--format json|markdown]
 `;
 
+function parseArguments(args) {
+  const paths = [];
+  let format = "json";
+  let hasFormat = false;
+  let optionsEnded = false;
+
+  for (let index = 0; index < args.length; index += 1) {
+    const argument = args[index];
+    if (!optionsEnded && argument === "--") {
+      optionsEnded = true;
+    } else if (!optionsEnded && argument === "--format") {
+      if (hasFormat) throw new Error("Option --format may only be specified once");
+      const value = args[index + 1];
+      if (!value || value.startsWith("-")) {
+        throw new Error("Missing value for --format (expected json or markdown)");
+      }
+      format = value;
+      hasFormat = true;
+      index += 1;
+    } else if (!optionsEnded && argument.startsWith("-")) {
+      throw new Error(`Unknown option: ${argument}`);
+    } else {
+      paths.push(argument);
+    }
+  }
+
+  if (!["json", "markdown"].includes(format)) {
+    throw new Error(`Unsupported format: ${format}`);
+  }
+  return { format, paths };
+}
+
 export async function main(argv) {
   const [command, ...rest] = argv;
   if (command === "--version" || command === "-v") {
@@ -23,17 +55,7 @@ export async function main(argv) {
   if (!["plan", "run", "report"].includes(command)) {
     throw new Error(`Unknown command: ${command}`);
   }
-  const formatIndex = rest.indexOf("--format");
-  const format = formatIndex === -1 ? "json" : rest[formatIndex + 1];
-  if (formatIndex !== -1 && !format) {
-    throw new Error("Missing value for --format (expected json or markdown)");
-  }
-  if (!["json", "markdown"].includes(format)) {
-    throw new Error(`Unsupported format: ${format}`);
-  }
-  const paths = formatIndex === -1
-    ? rest
-    : rest.filter((_, index) => index !== formatIndex && index !== formatIndex + 1);
+  const { format, paths } = parseArguments(rest);
   if (paths.length === 0) {
     console.log(usage.trim());
     return;
