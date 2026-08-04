@@ -14,6 +14,14 @@ node bin/agent-fixture-smoke.js run fixtures/pass.json
 node bin/agent-fixture-smoke.js report fixtures/blocked.json --format markdown
 ```
 
+`--format` may be provided once, before or after fixture paths. Unknown options
+and duplicate `--format` options are rejected before any fixture is opened. To
+use a fixture path beginning with `-`, place it after the option terminator:
+
+```bash
+node bin/agent-fixture-smoke.js plan -- --option-like-fixture.json
+```
+
 ## Demo
 
 Generate a small release evidence packet from the checked-in fixtures:
