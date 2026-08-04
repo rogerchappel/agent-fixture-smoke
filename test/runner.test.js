@@ -156,6 +156,35 @@ test("CLI rejects missing and unsupported format values", () => {
   assert.match(unsupported.stderr, /Unsupported format: yaml/);
 });
 
+test("CLI rejects unknown options before loading fixtures", () => {
+  const result = runCli("plan", "fixtures/does-not-exist.json", "--bogus");
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /Unknown option: --bogus/);
+  assert.doesNotMatch(result.stderr, /ENOENT|does-not-exist/);
+});
+
+test("CLI rejects duplicate format options before loading fixtures", () => {
+  const result = runCli(
+    "plan",
+    "fixtures/does-not-exist.json",
+    "--format",
+    "json",
+    "--format",
+    "markdown",
+  );
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /Option --format may only be specified once/);
+  assert.doesNotMatch(result.stderr, /ENOENT|does-not-exist/);
+});
+
+test("CLI accepts option-like fixture paths after the option terminator", () => {
+  const result = runCli("plan", "--", "--bogus");
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /ENOENT/);
+  assert.match(result.stderr, /--bogus/);
+  assert.doesNotMatch(result.stderr, /Unknown option/);
+});
+
 test("CLI rejects unknown commands before loading fixtures", () => {
   const result = runCli("deploy", "fixtures/does-not-exist.json");
   assert.notEqual(result.status, 0);
