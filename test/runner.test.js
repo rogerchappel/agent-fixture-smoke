@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { access, mkdtemp, rm } from "node:fs/promises";
+import { access, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { loadFixtures } from "../src/fixtures.js";
@@ -15,6 +15,37 @@ test("creates dry-run smoke plans from fixtures", async () => {
   const plan = createPlan(fixtures);
   assert.equal(plan[0].mode, "executable");
   assert.equal(plan[0].checks[0].type, "stdout-contains");
+});
+
+test("rejects malformed fixture field types with path and field diagnostics", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "agent-fixture-smoke-schema-"));
+  const cases = [
+    ["root.json", [], "root must be an object"],
+    ["id.json", { id: 3 }, 'field "id" must be a string'],
+    ["prompt.json", { prompt: false }, 'field "prompt" must be a string'],
+    ["command-scalar.json", { command: "node script.js" }, 'field "command" must be an array of strings'],
+    ["command-empty.json", { command: [] }, 'field "command" must be a non-empty array of strings'],
+    ["command-element.json", { command: ["node", 3] }, 'field "command[1]" must be a string'],
+    ["output.json", { expectedOutput: "ok" }, 'field "expectedOutput" must be an array of strings'],
+    ["files.json", { expectedFiles: [true] }, 'field "expectedFiles[0]" must be a string'],
+    ["effects.json", { forbiddenEffects: [null] }, 'field "forbiddenEffects[0]" must be a string'],
+    ["execute.json", { allowExecute: "yes" }, 'field "allowExecute" must be a boolean'],
+  ];
+
+  try {
+    for (const [name, fixture, message] of cases) {
+      const fixturePath = join(directory, name);
+      await writeFile(fixturePath, JSON.stringify(fixture));
+      await assert.rejects(loadFixtures([fixturePath]), (error) => {
+        assert.match(error.message, new RegExp(`Invalid fixture .*${name.replace(".", "\\.")}`));
+        assert.ok(error.message.includes(message), error.message);
+        assert.doesNotMatch(error.message, /TypeError/);
+        return true;
+      });
+    }
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
 });
 
 test("blocks fixtures with forbidden effects", async () => {
@@ -134,6 +165,20 @@ test("CLI defaults to JSON and retains every fixture path", () => {
   const result = runCli("plan", "fixtures/pass.json", "fixtures/skipped.json");
   assert.equal(result.status, 0, result.stderr);
   assert.equal(JSON.parse(result.stdout).plan.length, 2);
+});
+
+test("CLI reports fixture schema errors without planner TypeErrors", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "agent-fixture-smoke-cli-schema-"));
+  const fixturePath = join(directory, "invalid.json");
+  try {
+    await writeFile(fixturePath, JSON.stringify({ expectedOutput: "ok" }));
+    const result = runCli("plan", fixturePath);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Invalid fixture .*invalid\.json: field "expectedOutput" must be an array of strings/);
+    assert.doesNotMatch(result.stderr, /TypeError|\.map is not a function/);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
 });
 
 test("CLI supports explicit JSON and Markdown formats", () => {

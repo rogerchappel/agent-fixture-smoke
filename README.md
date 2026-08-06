@@ -36,7 +36,27 @@ for a short video outline and social hooks.
 
 ## Fixture Shape
 
-Fixtures are JSON files with `prompt`, optional `command`, `expectedOutput`, `expectedFiles`, `forbiddenEffects`, and `allowExecute`.
+Fixtures are JSON objects. All fields are optional; an omitted `id` defaults to
+the fixture filename, while omitted check arrays default to empty arrays.
+
+```json
+{
+  "id": "prints-version",
+  "prompt": "Confirm the local tool version",
+  "command": ["node", "bin/tool.js", "--version"],
+  "expectedOutput": ["1.0.0"],
+  "expectedFiles": ["package.json"],
+  "forbiddenEffects": [],
+  "allowExecute": true
+}
+```
+
+`id` and `prompt` must be strings. `command`, when present, must be a non-empty
+array of strings: its first item is the executable and the remaining items are
+passed as arguments. `expectedOutput`, `expectedFiles`, and `forbiddenEffects`
+must be arrays containing only strings. `allowExecute` must be a boolean.
+Malformed fixtures are rejected before planning with an error naming the
+fixture path and invalid field.
 
 ## Safety Notes
 
