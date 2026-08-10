@@ -2,6 +2,9 @@
 
 `agent-fixture-smoke` turns small agent workflow fixtures into deterministic smoke plans and release evidence. It is designed for skill, connector, and action-plan repos that need local checks without calling live LLMs or remote services.
 
+Node.js 20.0.0 or newer is required. CI verifies both the exact minimum and the
+current Node 20 release.
+
 ## Quickstart
 
 ```bash
@@ -76,4 +79,6 @@ Run the same gate used by CI before cutting a release or handing the package to 
 npm run release:check
 ```
 
-The release check runs syntax checks, the Node test suite, CLI smoke coverage, and an `npm pack --dry-run` package contents assertion. The package smoke includes the demo script, tutorial, and promo brief so the public quickstart artifacts stay publishable with the CLI.
+The release check runs syntax checks, the Node test suite, CLI smoke coverage,
+and a packed-package install and version smoke. The package smoke also checks
+that the demo script, tutorial, and promo brief remain publishable with the CLI.
