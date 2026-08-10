@@ -2,7 +2,10 @@ import { loadFixtures } from "./fixtures.js";
 import { createPlan } from "./planner.js";
 import { runPlan } from "./runner.js";
 import { renderJson, renderMarkdown } from "./reporter.js";
-import packageJson from "../package.json" with { type: "json" };
+import { createRequire } from "node:module";
+
+const require = createRequire(import.meta.url);
+const packageJson = require("../package.json");
 
 const usage = `Usage:
   agent-fixture-smoke plan <fixture...> [--format json|markdown]

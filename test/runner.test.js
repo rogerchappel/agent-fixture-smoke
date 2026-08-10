@@ -4,11 +4,14 @@ import { spawnSync } from "node:child_process";
 import { access, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { createRequire } from "node:module";
 import { loadFixtures } from "../src/fixtures.js";
 import { createPlan } from "../src/planner.js";
 import { runPlan } from "../src/runner.js";
 import { renderJson, renderMarkdown } from "../src/reporter.js";
-import packageJson from "../package.json" with { type: "json" };
+
+const require = createRequire(import.meta.url);
+const packageJson = require("../package.json");
 
 test("creates dry-run smoke plans from fixtures", async () => {
   const fixtures = await loadFixtures(["fixtures/pass.json"]);
