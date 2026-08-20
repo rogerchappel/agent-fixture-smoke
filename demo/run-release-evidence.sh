@@ -32,5 +32,7 @@ grep -q "Agent Fixture Smoke Plan" "$out_dir/plan.md"
 grep -q "Status: pass" "$out_dir/run.md"
 grep -q "Agent Fixture Smoke Report" "$out_dir/report.md"
 grep -q "Blocked: 1" "$out_dir/report.md"
+grep -q "Passed: 0" "$out_dir/report.md"
+grep -q "Skipped: 2" "$out_dir/report.md"
 
 echo "wrote demo release evidence to $out_dir"

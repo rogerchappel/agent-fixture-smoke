@@ -14,7 +14,7 @@ npm run release:check
 node bin/agent-fixture-smoke.js --version
 node bin/agent-fixture-smoke.js plan fixtures/pass.json --format markdown
 node bin/agent-fixture-smoke.js run fixtures/pass.json
-node bin/agent-fixture-smoke.js report fixtures/blocked.json --format markdown
+node bin/agent-fixture-smoke.js report fixtures/pass.json --format markdown # exits 1: checks are unexecuted
 ```
 
 `--format` may be provided once, before or after fixture paths. Unknown options
@@ -63,7 +63,12 @@ fixture path and invalid field.
 
 ## Safety Notes
 
-Commands run only when the fixture sets `allowExecute: true` and the caller uses `run`. The `report` command stays in dry-run mode and is suitable for release notes.
+Commands run only when the fixture sets `allowExecute: true` and the caller uses
+`run`. `plan` previews commands and checks without assigning outcomes. `report`
+renders dry-run evidence: executable checks are `skipped`, never `pass`, because
+they were not executed. A report containing failed, blocked, or skipped results
+exits 1, so it cannot be mistaken for completed verification. Use `run` when a
+successful exit and genuine pass evidence are required.
 
 Executable fixtures are isolated from one another at the reporting boundary. If a command exits nonzero, times out after five seconds, or cannot start, its result is marked `fail` with available exit, signal, stdout, and stderr diagnostics. Later fixtures still run, the complete JSON or Markdown report is printed, and the CLI exits nonzero after reporting all results.
 

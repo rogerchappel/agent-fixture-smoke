@@ -135,6 +135,20 @@ test("reports forbidden effects as blocked without executing in report mode", as
   }
 });
 
+test("does not count unexecuted executable fixtures as passed", async () => {
+  const fixtures = await loadFixtures(["fixtures/pass.json"]);
+  const plan = createPlan(fixtures);
+
+  const report = await runPlan(plan, { execute: false });
+  assert.deepEqual(report.summary, { passed: 0, failed: 0, blocked: 0, skipped: 1 });
+  assert.equal(report.results[0].status, "skipped");
+  assert.deepEqual(report.results[0].notes, ["Checks were not executed in report mode."]);
+
+  const executed = await runPlan(plan, { execute: true });
+  assert.deepEqual(executed.summary, { passed: 1, failed: 0, blocked: 0, skipped: 0 });
+  assert.equal(executed.results[0].status, "pass");
+});
+
 test("returns a nonzero blocked result from report", () => {
   const result = spawnSync("node", [
     "bin/agent-fixture-smoke.js",
@@ -186,8 +200,14 @@ test("CLI reports fixture schema errors without planner TypeErrors", async () =>
 
 test("CLI supports explicit JSON and Markdown formats", () => {
   const json = runCli("report", "fixtures/pass.json", "--format", "json");
-  assert.equal(json.status, 0, json.stderr);
-  assert.doesNotThrow(() => JSON.parse(json.stdout));
+  assert.equal(json.status, 1, json.stderr);
+  const report = JSON.parse(json.stdout);
+  assert.deepEqual(report.summary, { passed: 0, failed: 0, blocked: 0, skipped: 1 });
+  assert.equal(report.results[0].status, "skipped");
+
+  const run = runCli("run", "fixtures/pass.json", "--format", "json");
+  assert.equal(run.status, 0, run.stderr);
+  assert.deepEqual(JSON.parse(run.stdout).summary, { passed: 1, failed: 0, blocked: 0, skipped: 0 });
 
   const markdown = runCli("plan", "fixtures/pass.json", "--format", "markdown");
   assert.equal(markdown.status, 0, markdown.stderr);

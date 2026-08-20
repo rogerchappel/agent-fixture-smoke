@@ -12,10 +12,11 @@ bash demo/run-release-evidence.sh
 
 The script writes three Markdown files under `tmp/demo-release-evidence/`:
 
-- `plan.md` previews the fixture commands and expected evidence.
-- `run.md` executes only the fixture that opts in with `allowExecute`.
-- `report.md` combines pass, blocked, and skipped fixtures into a release note
-  friendly summary.
+- `plan.md` previews fixture commands and expected checks; it has no outcomes.
+- `run.md` executes only the fixture that opts in with `allowExecute` and records
+  genuine pass evidence.
+- `report.md` describes dry-run outcomes. Unexecuted executable checks are
+  `skipped`, while forbidden effects are `blocked`; this demo report exits 1.
 
 ## Inspect the fixtures
 
@@ -30,7 +31,9 @@ The demo uses the repository fixtures directly:
 
 1. Add one fixture for the smallest executable success path.
 2. Add blocked or skipped fixtures for workflows that should not run in CI.
-3. Generate `plan`, `run`, and `report` outputs as release artifacts.
+3. Use `plan` for previews, `report` for explicitly unverified dry-run evidence,
+   and `run` for completed verification. `report` and `run` exit 1 when any
+   result is failed, blocked, or skipped.
 4. Commit only the fixtures and docs; keep generated evidence in CI artifacts or
    temporary release notes unless the project intentionally versions it.
 

@@ -64,7 +64,19 @@ try {
         console.error(`Packed CLI version smoke failed: expected ${packageJson.version}, received ${version.stdout.trim()}`);
         process.exitCode = version.status ?? 1;
       } else {
-        console.log(`Package smoke passed with ${pack.files.length} files and CLI version ${packageJson.version}.`);
+        const report = spawnSync(cli, ['report', join(installDirectory, 'node_modules', 'agent-fixture-smoke', 'fixtures', 'pass.json'), '--format', 'json'], { encoding: 'utf8' });
+        const reportOutput = JSON.parse(report.stdout);
+        const run = spawnSync(cli, ['run', join(installDirectory, 'node_modules', 'agent-fixture-smoke', 'fixtures', 'pass.json'), '--format', 'json'], { encoding: 'utf8' });
+        const runOutput = JSON.parse(run.stdout);
+        if (report.status !== 1 || reportOutput.summary.passed !== 0 || reportOutput.summary.skipped !== 1) {
+          console.error('Packed CLI report smoke counted unexecuted checks as verified.');
+          process.exitCode = 1;
+        } else if (run.status !== 0 || runOutput.summary.passed !== 1 || runOutput.summary.skipped !== 0) {
+          console.error('Packed CLI run smoke did not record the executed fixture as passed.');
+          process.exitCode = 1;
+        } else {
+          console.log(`Package smoke passed with ${pack.files.length} files, CLI version ${packageJson.version}, and report/run evidence checks.`);
+        }
       }
     }
   }
