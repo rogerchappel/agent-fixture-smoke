@@ -67,5 +67,5 @@ export async function main(argv) {
   const plan = createPlan(fixtures);
   const report = command === "plan" ? { plan } : await runPlan(plan, { execute: command === "run" });
   console.log(format === "markdown" ? renderMarkdown(report) : renderJson(report));
-  if (report.summary?.failed > 0 || report.summary?.blocked > 0) process.exitCode = 1;
+  if (report.summary?.failed > 0 || report.summary?.blocked > 0 || report.summary?.skipped > 0) process.exitCode = 1;
 }

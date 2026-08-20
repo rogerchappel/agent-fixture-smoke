@@ -22,7 +22,7 @@
   "scripts": {
     "build": "node scripts/build.js",
     "check": "node scripts/check.js",
-    "smoke": "node bin/agent-fixture-smoke.js report fixtures/pass.json --format markdown",
+    "smoke": "node bin/agent-fixture-smoke.js run fixtures/pass.json --format markdown",
     "test": "node --test",
     "package:smoke": "node scripts/package-smoke.js",
     "release:check": "npm run check && npm test && npm run smoke && npm run package:smoke"

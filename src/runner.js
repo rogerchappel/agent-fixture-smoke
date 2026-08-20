@@ -24,7 +24,12 @@ async function runItem(item, options) {
     return { id: item.id, status: "blocked", notes: ["Fixture declares forbidden side effects."] };
   }
   if (item.mode !== "executable" || !options.execute) {
-    return { id: item.id, status: "pass", notes: ["Dry-run plan only."], checks: item.checks };
+    return {
+      id: item.id,
+      status: "skipped",
+      notes: [options.execute ? "Fixture is not opted in for execution." : "Checks were not executed in report mode."],
+      checks: item.checks
+    };
   }
   let stdout;
   try {
