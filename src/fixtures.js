@@ -25,21 +25,24 @@ function validateFixture(fixture, fixturePath) {
     throw new Error(`Invalid fixture ${fixturePath}: root must be an object.`);
   }
 
-  optionalString(fixture, fixturePath, "id");
+  optionalString(fixture, fixturePath, "id", { nonBlank: true });
   optionalString(fixture, fixturePath, "prompt");
-  optionalStringArray(fixture, fixturePath, "command", { nonEmpty: true });
-  optionalStringArray(fixture, fixturePath, "expectedOutput");
-  optionalStringArray(fixture, fixturePath, "expectedFiles");
-  optionalStringArray(fixture, fixturePath, "forbiddenEffects");
+  optionalStringArray(fixture, fixturePath, "command", { nonEmpty: true, nonBlank: true });
+  optionalStringArray(fixture, fixturePath, "expectedOutput", { nonBlank: true });
+  optionalStringArray(fixture, fixturePath, "expectedFiles", { nonBlank: true });
+  optionalStringArray(fixture, fixturePath, "forbiddenEffects", { nonBlank: true });
 
   if ("allowExecute" in fixture && typeof fixture.allowExecute !== "boolean") {
     invalidField(fixturePath, "allowExecute", "must be a boolean");
   }
 }
 
-function optionalString(fixture, fixturePath, field) {
+function optionalString(fixture, fixturePath, field, options = {}) {
   if (field in fixture && typeof fixture[field] !== "string") {
     invalidField(fixturePath, field, "must be a string");
+  }
+  if (options.nonBlank && field in fixture && fixture[field].trim() === "") {
+    invalidField(fixturePath, field, "must be a nonblank string");
   }
 }
 
@@ -53,6 +56,12 @@ function optionalStringArray(fixture, fixturePath, field, options = {}) {
   const invalidIndex = value.findIndex((item) => typeof item !== "string");
   if (invalidIndex !== -1) {
     invalidField(fixturePath, `${field}[${invalidIndex}]`, "must be a string");
+  }
+  if (options.nonBlank) {
+    const blankIndex = value.findIndex((item) => item.trim() === "");
+    if (blankIndex !== -1) {
+      invalidField(fixturePath, `${field}[${blankIndex}]`, "must be a nonblank string");
+    }
   }
 }
 

@@ -54,10 +54,12 @@ the fixture filename, while omitted check arrays default to empty arrays.
 }
 ```
 
-`id` and `prompt` must be strings. `command`, when present, must be a non-empty
-array of strings: its first item is the executable and the remaining items are
-passed as arguments. `expectedOutput`, `expectedFiles`, and `forbiddenEffects`
-must be arrays containing only strings. `allowExecute` must be a boolean.
+`id` must be a nonblank string when provided; `prompt` must be a string.
+`command`, when present, must be a non-empty array of nonblank strings: its
+first item is the executable and the remaining items are passed as arguments.
+`expectedOutput`, `expectedFiles`, and `forbiddenEffects` must be arrays
+containing only nonblank strings. Empty check arrays remain valid.
+`allowExecute` must be a boolean.
 Malformed fixtures are rejected before planning with an error naming the
 fixture path and invalid field.
 
