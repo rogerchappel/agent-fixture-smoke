@@ -25,13 +25,18 @@ test("rejects malformed fixture field types with path and field diagnostics", as
   const cases = [
     ["root.json", [], "root must be an object"],
     ["id.json", { id: 3 }, 'field "id" must be a string'],
+    ["id-blank.json", { id: "  " }, 'field "id" must be a nonblank string'],
     ["prompt.json", { prompt: false }, 'field "prompt" must be a string'],
     ["command-scalar.json", { command: "node script.js" }, 'field "command" must be an array of strings'],
     ["command-empty.json", { command: [] }, 'field "command" must be a non-empty array of strings'],
     ["command-element.json", { command: ["node", 3] }, 'field "command[1]" must be a string'],
+    ["command-blank.json", { command: ["  "] }, 'field "command[0]" must be a nonblank string'],
     ["output.json", { expectedOutput: "ok" }, 'field "expectedOutput" must be an array of strings'],
+    ["output-blank.json", { expectedOutput: [""] }, 'field "expectedOutput[0]" must be a nonblank string'],
     ["files.json", { expectedFiles: [true] }, 'field "expectedFiles[0]" must be a string'],
+    ["files-blank.json", { expectedFiles: ["\t"] }, 'field "expectedFiles[0]" must be a nonblank string'],
     ["effects.json", { forbiddenEffects: [null] }, 'field "forbiddenEffects[0]" must be a string'],
+    ["effects-blank.json", { forbiddenEffects: [" "] }, 'field "forbiddenEffects[0]" must be a nonblank string'],
     ["execute.json", { allowExecute: "yes" }, 'field "allowExecute" must be a boolean'],
   ];
 
