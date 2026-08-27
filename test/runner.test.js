@@ -177,11 +177,30 @@ test("prints package version for CLI smoke checks", () => {
   assert.equal(result.stdout.trim(), packageJson.version);
 });
 
+test("CLI rejects trailing arguments for version and help", () => {
+  for (const option of ["--version", "-v", "--help", "-h"]) {
+    const result = runCli(option, "--bogus");
+    assert.notEqual(result.status, 0);
+    assert.equal(result.stdout, "");
+    assert.match(result.stderr, new RegExp(`Unexpected argument after ${option.replace("-", "\\-")}: --bogus`));
+  }
+});
+
 function runCli(...args) {
   return spawnSync(process.execPath, ["bin/agent-fixture-smoke.js", ...args], {
     encoding: "utf8",
   });
 }
+
+test("CLI rejects commands without fixture paths", () => {
+  for (const command of ["plan", "run", "report"]) {
+    const result = runCli(command);
+    assert.notEqual(result.status, 0);
+    assert.equal(result.stdout, "");
+    assert.match(result.stderr, new RegExp(`${command} requires at least one fixture path`));
+    assert.match(result.stderr, /Usage:/);
+  }
+});
 
 test("CLI defaults to JSON and retains every fixture path", () => {
   const result = runCli("plan", "fixtures/pass.json", "fixtures/skipped.json");
