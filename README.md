@@ -25,6 +25,11 @@ use a fixture path beginning with `-`, place it after the option terminator:
 node bin/agent-fixture-smoke.js plan -- --option-like-fixture.json
 ```
 
+Each of `plan`, `run`, and `report` requires at least one fixture path. A
+missing path prints a usage diagnostic to stderr and exits nonzero. `--help`,
+`-h`, `--version`, and `-v` are complete top-level invocations: trailing
+arguments are rejected instead of being ignored.
+
 ## Demo
 
 Generate a small release evidence packet from the checked-in fixtures:
