@@ -48,10 +48,12 @@ function parseArguments(args) {
 export async function main(argv) {
   const [command, ...rest] = argv;
   if (command === "--version" || command === "-v") {
+    if (rest.length > 0) throw new Error(`Unexpected argument after ${command}: ${rest[0]}`);
     console.log(packageJson.version);
     return;
   }
   if (!command || command === "--help" || command === "-h") {
+    if (command && rest.length > 0) throw new Error(`Unexpected argument after ${command}: ${rest[0]}`);
     console.log(usage.trim());
     return;
   }
@@ -60,8 +62,7 @@ export async function main(argv) {
   }
   const { format, paths } = parseArguments(rest);
   if (paths.length === 0) {
-    console.log(usage.trim());
-    return;
+    throw new Error(`${command} requires at least one fixture path\n\n${usage.trim()}`);
   }
   const fixtures = await loadFixtures(paths);
   const plan = createPlan(fixtures);
